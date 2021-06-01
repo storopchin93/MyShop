@@ -31,6 +31,7 @@ namespace CRM_UI
         private void button1_Click(object sender, EventArgs e)
         {
             var id = dataGridView1.SelectedRows[0].Cells[0].Value;
+
             if (typeof(T) == typeof(Product))
             {
                 var product = set.Find(id) as Product;
@@ -73,6 +74,11 @@ namespace CRM_UI
                     }
                 }
             }
+
+        }
+
+        private void Catalog_Load(object sender, EventArgs e)
+        {
 
         }
     }
