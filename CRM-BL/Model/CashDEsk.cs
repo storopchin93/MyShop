@@ -11,57 +11,33 @@ namespace CRM_BL.Model
     /// </summary>
     public class CashDesk
     {
-        CrmContext db = new CrmContext();
+        CrmContext db;
 
-        public Seller Seller { get; set; }
-
-        public Queue<Cart> Carts { get; set; }
-
-        public int MaxQueueLenght { get; set; }
-        /// <summary>
-        /// Покупатель ушедший из магазина если большая очередь.
-        /// </summary>
-        public int ExitCustomer { get; set; }
-
-        /// <summary>
-        /// Номер кассы.
-        /// </summary>
         public int Number { get; set; }
-
-        /// <summary>
-        /// Флаг сохранения в БД.
-        /// </summary>
+        public Seller Seller { get; set; }
+        public Queue<Cart> Queue { get; set; }
+        public int MaxQueueLenght { get; set; }
+        public int ExitCustomer { get; set; }
         public bool IsModel { get; set; }
+        public int Count => Queue.Count;
 
-        public int Count => Carts.Count;
+        public event EventHandler<Check> CheckClosed;
 
-        /// <summary>
-        /// Закрытие чека.
-        /// </summary>
-        public EventHandler<Check> CheckClosed;
-        /// <summary>
-        /// Создать кассу.
-        /// </summary>
-        /// <param name="number">Номер кассы.</param>
-        /// <param name="seller">Продавец.</param>
-        public CashDesk(int number, Seller seller)
+        public CashDesk(int number, Seller seller, CrmContext db)
         {
-            Seller = seller;
             Number = number;
-            Carts = new Queue<Cart>();
+            Seller = seller;
+            Queue = new Queue<Cart>();
             IsModel = true;
             MaxQueueLenght = 10;
+            this.db = db ?? new CrmContext();
         }
 
-        /// <summary>
-        /// Добавить в очередь корзину.
-        /// </summary>
-        /// <param name="cart">Корзина.</param>
         public void Enqueue(Cart cart)
         {
-            if (Carts.Count < MaxQueueLenght)
+            if (Queue.Count < MaxQueueLenght)
             {
-                Carts.Enqueue(cart);
+                Queue.Enqueue(cart);
             }
             else
             {
@@ -70,25 +46,27 @@ namespace CRM_BL.Model
         }
 
         /// <summary>
-        /// Извлечь корзину из очереди.
+        /// Удаление корзины.
         /// </summary>
         /// <returns>Сумма.</returns>
         public decimal Dequeue()
         {
             decimal sum = 0;
-            if(Carts.Count == 0)
+            if (Queue.Count == 0)
             {
                 return 0;
             }
-            var cart = Carts.Dequeue();
-            if (cart != null)
+
+            var card = Queue.Dequeue();
+
+            if (card != null)
             {
                 var check = new Check()
                 {
-                    SellerId = this.Seller.SellerId,
-                    Seller = this.Seller,
-                    CustomerId = cart.Customer.CustomerId,
-                    Customer = cart.Customer,
+                    SellerId = Seller.SellerId,
+                    Seller = Seller,
+                    CustomerId = card.Customer.CustomerId,
+                    Customer = card.Customer,
                     Created = DateTime.Now
                 };
 
@@ -104,8 +82,7 @@ namespace CRM_BL.Model
 
                 var sells = new List<Sell>();
 
-
-                foreach (Product product in cart)
+                foreach (Product product in card)
                 {
                     if (product.Count > 0)
                     {
@@ -128,6 +105,7 @@ namespace CRM_BL.Model
                         sum += product.Price;
                     }
                 }
+
                 check.Price = sum;
 
                 if (!IsModel)
@@ -137,15 +115,13 @@ namespace CRM_BL.Model
 
                 CheckClosed?.Invoke(this, check);
             }
+
             return sum;
         }
 
-
-
-
         public override string ToString()
         {
-            return $"Касса № {Number}";
+            return $"Касса №{Number}";
         }
     }
 }

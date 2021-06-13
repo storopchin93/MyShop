@@ -20,7 +20,7 @@ namespace CRM_BL.Model
 
         public override string ToString()
         {
-            return $"{Name} - {Price}";
+            return $"Имя: {Name} \tЦена: {Price}";
         }
 
         public override int GetHashCode()

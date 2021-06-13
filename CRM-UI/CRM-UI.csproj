@@ -53,6 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Autorization.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Autorization.Designer.cs">
+      <DependentUpon>Autorization.cs</DependentUpon>
+    </Compile>
     <Compile Include="CashBoxView.cs" />
     <Compile Include="Catalog.cs">
       <SubType>Form</SubType>
@@ -92,6 +98,9 @@
     <Compile Include="SellerForm.Designer.cs">
       <DependentUpon>SellerForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Autorization.resx">
+      <DependentUpon>Autorization.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Catalog.resx">
       <DependentUpon>Catalog.cs</DependentUpon>
     </EmbeddedResource>

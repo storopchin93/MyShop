@@ -72,7 +72,7 @@ namespace CRM_BL.Model
             return result;
         }
 
-        public List<Product> GetRandomProduct(int min, int max)
+        public List<Product> GetRandomProducts(int min, int max)
         {
             var result = new List<Product>();
             var count = random.Next(min, max);
