@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace CRM_BL.Model
 {
+    /// <summary>
+    /// Клиентская корзина.
+    /// </summary>
     public class Cart
     {
         public Customer Customer { get; set; }

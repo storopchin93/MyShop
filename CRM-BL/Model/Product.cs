@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CRM_BL.Model
 {
+    /// <summary>
+    /// Продукт.
+    /// </summary>
     public class Product
     {
         public int ProductId { get; set; }

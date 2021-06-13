@@ -11,14 +11,14 @@ using System.Windows.Forms;
 
 namespace CRM_UI
 {
+    /// <summary>
+    /// Главная форма.
+    /// </summary>
     public partial class Main : Form
     {
         CrmContext db;
 
-
-
         public Main()
-
         {           
             InitializeComponent();
             db = new CrmContext();
@@ -33,9 +33,6 @@ namespace CRM_UI
                 db.SaveChanges();
             }
         }
-
-
-
 
         private void SellerAddToolStripMenuItem3_Click(object sender, EventArgs e)
         {
@@ -83,9 +80,14 @@ namespace CRM_UI
 
         private void Main_Load(object sender, EventArgs e)
         {
-
+            var items = db.Products.ToArray();
+            listBox1.Items.AddRange(items); 
         }
 
-
+        private void modelingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModelingForm modelingForm = new ModelingForm();
+            modelingForm.Show();
+        }
     }
 }

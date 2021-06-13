@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CRM_BL.Model
 {
+    /// <summary>
+    /// Касса.
+    /// </summary>
     public class CashDesk
     {
         CrmContext db = new CrmContext();
@@ -20,6 +23,9 @@ namespace CRM_BL.Model
         /// </summary>
         public int ExitCustomer { get; set; }
 
+        /// <summary>
+        /// Номер кассы.
+        /// </summary>
         public int Number { get; set; }
 
         /// <summary>
@@ -27,17 +33,33 @@ namespace CRM_BL.Model
         /// </summary>
         public bool IsModel { get; set; }
 
+        public int Count => Carts.Count;
+
+        /// <summary>
+        /// Закрытие чека.
+        /// </summary>
+        public EventHandler<Check> CheckClosed;
+        /// <summary>
+        /// Создать кассу.
+        /// </summary>
+        /// <param name="number">Номер кассы.</param>
+        /// <param name="seller">Продавец.</param>
         public CashDesk(int number, Seller seller)
         {
             Seller = seller;
             Number = number;
             Carts = new Queue<Cart>();
             IsModel = true;
+            MaxQueueLenght = 10;
         }
 
+        /// <summary>
+        /// Добавить в очередь корзину.
+        /// </summary>
+        /// <param name="cart">Корзина.</param>
         public void Enqueue(Cart cart)
         {
-            if (Carts.Count <= MaxQueueLenght)
+            if (Carts.Count < MaxQueueLenght)
             {
                 Carts.Enqueue(cart);
             }
@@ -47,18 +69,26 @@ namespace CRM_BL.Model
             }
         }
 
+        /// <summary>
+        /// Извлечь корзину из очереди.
+        /// </summary>
+        /// <returns>Сумма.</returns>
         public decimal Dequeue()
         {
-            var card = Carts.Dequeue();
             decimal sum = 0;
-            if (card != null)
+            if(Carts.Count == 0)
+            {
+                return 0;
+            }
+            var cart = Carts.Dequeue();
+            if (cart != null)
             {
                 var check = new Check()
                 {
                     SellerId = this.Seller.SellerId,
                     Seller = this.Seller,
-                    CustomerId = card.Customer.CustomerId,
-                    Customer = card.Customer,
+                    CustomerId = cart.Customer.CustomerId,
+                    Customer = cart.Customer,
                     Created = DateTime.Now
                 };
 
@@ -75,7 +105,7 @@ namespace CRM_BL.Model
                 var sells = new List<Sell>();
 
 
-                foreach (Product product in card)
+                foreach (Product product in cart)
                 {
                     if (product.Count > 0)
                     {
@@ -97,15 +127,25 @@ namespace CRM_BL.Model
                         product.Count--;
                         sum += product.Price;
                     }
-
                 }
+                check.Price = sum;
 
                 if (!IsModel)
                 {
                     db.SaveChanges();
                 }
+
+                CheckClosed?.Invoke(this, check);
             }
             return sum;
+        }
+
+
+
+
+        public override string ToString()
+        {
+            return $"Касса № {Number}";
         }
     }
 }
